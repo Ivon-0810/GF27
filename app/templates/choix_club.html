@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block titre %}Choisir un club{% endblock %}
+{% block contenu %}
+<h1>Choisis ton club</h1>
+{% for ligue in ligues %}
+    <div class="carte">
+        <h2>{{ ligue.nom }}</h2>
+        {% for division in ligue.divisions %}
+            <h3>{{ division.nom }} (D{{ division.niveau }})</h3>
+            <div class="grille-clubs">
+                {% for club in division.clubs %}
+                    <div class="carte club-carte">
+                        <a href="{{ url_for('main.choisir_club', club_id=club.id) }}">
+                            <div>{{ club.nom }}</div>
+                            <div style="color:var(--texte-att); font-size:0.8rem;">{{ club.ville or '' }}</div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+{% endfor %}
+{% endblock %}

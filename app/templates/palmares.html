@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block titre %}Palmarès{% endblock %}
+{% block contenu %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1><i class="bi bi-trophy-fill text-accent"></i> Palmarès individuel</h1>
+    <form method="get" class="d-flex gap-2">
+        <select name="saison_id" class="form-select form-select-sm" onchange="this.form.submit()">
+            {% for s in saisons %}
+            <option value="{{ s.id }}" {{ "selected" if saison and s.id == saison.id }}>
+                {{ s.annee_debut }}-{{ s.annee_fin }}
+            </option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
+
+{% if saison and not distinctions_mondiales and not distinctions_continentales and not distinctions_par_division %}
+<div class="carte text-center">
+    <p class="mb-3">Aucune distinction calculée pour la saison {{ saison.annee_debut }}-{{ saison.annee_fin }}.</p>
+    <p class="text-secondary small">Le palmarès se base sur les statistiques des matchs joués/simulés
+    cette saison. Joue ou simule quelques matchs, puis calcule le palmarès.</p>
+    <form method="post" action="{{ url_for('palmares.calculer', saison_id=saison.id) }}">
+        <button class="btn btn-fm">Calculer le palmarès de cette saison</button>
+    </form>
+</div>
+{% endif %}
+
+{% if distinctions_mondiales %}
+<div class="carte">
+    <h3><i class="bi bi-globe"></i> Distinctions mondiales</h3>
+    <div class="row row-cols-1 row-cols-md-2 g-3">
+        {% for d in distinctions_mondiales %}
+        <div class="col">
+            <div class="carte mb-0 d-flex align-items-center gap-3">
+                <div class="podium-rang podium-{{ d.rang }}">{{ d.rang }}</div>
+                <div>
+                    <div class="text-secondary small">{{ d.type_distinction.nom }}</div>
+                    <div class="fw-bold">
+                        {{ d.joueur.nom if d.joueur else (d.entraineur.nom if d.entraineur else "—") }}
+                    </div>
+                    <div class="text-secondary small">{{ d.club.nom if d.club else "" }} — {{ d.valeur_cle }}</div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% if distinctions_continentales %}
+<div class="carte">
+    <h3><i class="bi bi-map"></i> Distinctions continentales</h3>
+    <div class="row row-cols-1 row-cols-md-2 g-3">
+        {% for d in distinctions_continentales %}
+        <div class="col">
+            <div class="carte mb-0 d-flex align-items-center gap-3">
+                <div class="podium-rang podium-{{ d.rang }}">{{ d.rang }}</div>
+                <div>
+                    <div class="text-secondary small">{{ d.type_distinction.nom }}</div>
+                    <div class="fw-bold">{{ d.joueur.nom if d.joueur else "—" }}</div>
+                    <div class="text-secondary small">{{ d.club.nom if d.club else "" }} — {{ d.valeur_cle }}</div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% for division_id, distinctions in distinctions_par_division.items() %}
+<div class="carte">
+    <h3><i class="bi bi-flag-fill"></i> {{ distinctions[0].type_distinction.nom.split('—')[1] }}</h3>
+    <div class="row row-cols-1 row-cols-md-2 g-3">
+        {% for d in distinctions %}
+        <div class="col">
+            <div class="carte mb-0 d-flex align-items-center gap-3">
+                <div class="podium-rang podium-{{ d.rang }}">{{ d.rang }}</div>
+                <div>
+                    <div class="text-secondary small">{{ d.type_distinction.nom.split('—')[0] }}</div>
+                    <div class="fw-bold">
+                        {{ d.joueur.nom if d.joueur else (d.entraineur.nom if d.entraineur else "—") }}
+                    </div>
+                    <div class="text-secondary small">{{ d.club.nom if d.club else "" }} — {{ d.valeur_cle }}</div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

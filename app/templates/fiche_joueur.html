@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block titre %}{{ joueur.nom }}{% endblock %}
+{% block contenu %}
+<h1>{{ joueur.nom }}</h1>
+<div class="carte">
+    <p><strong>Poste :</strong> {{ joueur.poste_principal }} ({{ joueur.postes_secondaires or "—" }})</p>
+    <p><strong>Âge :</strong> {{ joueur.age() or "—" }} — <strong>Nationalité :</strong> {{ joueur.nationalite }}</p>
+    <p><strong>Valeur marchande :</strong> {{ "{:,.0f}".format(joueur.valeur_marchande) }} €</p>
+    <p><strong>Salaire mensuel :</strong> {{ "{:,.0f}".format(joueur.salaire_mensuel) }} €</p>
+    <p><strong>Fin de contrat :</strong> {{ joueur.fin_contrat.strftime('%d/%m/%Y') if joueur.fin_contrat else "—" }}</p>
+</div>
+<div class="carte">
+    <h3>Attributs</h3>
+    <table class="table">
+        <tr><td>Attaque</td><td>{{ joueur.attaque }}</td></tr>
+        <tr><td>Défense</td><td>{{ joueur.defense }}</td></tr>
+        <tr><td>Passe</td><td>{{ joueur.passe }}</td></tr>
+        <tr><td>Physique</td><td>{{ joueur.physique }}</td></tr>
+        <tr><td>Vitesse</td><td>{{ joueur.vitesse }}</td></tr>
+        <tr><td>Technique</td><td>{{ joueur.technique }}</td></tr>
+        <tr><td>Mental</td><td>{{ joueur.mental }}</td></tr>
+        <tr><td>Potentiel</td><td>{{ joueur.potentiel }}</td></tr>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block titre %}Effectif{% endblock %}
+{% block contenu %}
+<h1>Effectif — {{ club.nom }}</h1>
+<div class="carte">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nom</th><th>Poste</th><th>Âge</th><th>Note</th>
+                <th>Forme</th><th>Moral</th><th>Valeur</th><th>Contrat jusqu'à</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for j in joueurs %}
+            <tr>
+                <td><a href="{{ url_for('effectif.fiche_joueur', joueur_id=j.id) }}" style="color:var(--texte)">{{ j.nom }}</a></td>
+                <td><span class="badge-poste">{{ j.poste_principal }}</span></td>
+                <td>{{ j.age() or '—' }}</td>
+                <td>{{ j.overall() }}</td>
+                <td>{{ j.forme }}%</td>
+                <td>{{ j.moral }}%</td>
+                <td>{{ "{:,.0f}".format(j.valeur_marchande) }} €</td>
+                <td>{{ j.fin_contrat.strftime('%m/%Y') if j.fin_contrat else '—' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

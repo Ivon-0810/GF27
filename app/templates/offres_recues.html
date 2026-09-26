@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block titre %}Offres reçues{% endblock %}
+{% block contenu %}
+<h1><i class="bi bi-envelope text-accent"></i> Offres reçues</h1>
+<div class="carte">
+    {% if offres %}
+    <table class="table table-sm">
+        <thead><tr><th>Joueur</th><th>Club acheteur</th><th>Montant</th><th></th></tr></thead>
+        <tbody>
+        {% for o in offres %}
+        <tr>
+            <td>{{ o.joueur.nom if o.joueur else o.joueur_id }}</td>
+            <td>{{ o.club_acheteur.nom if o.club_acheteur else o.club_acheteur_id }}</td>
+            <td>{{ "{:,.0f}".format(o.montant) }} €</td>
+            <td>
+                <button class="btn btn-sm btn-fm" onclick="repondre({{ o.id }}, true)">Accepter</button>
+                <button class="btn btn-sm btn-outline-light" onclick="repondre({{ o.id }}, false)">Refuser</button>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="text-secondary">Aucune offre en attente pour l'instant.</p>
+    {% endif %}
+</div>
+<script>
+function repondre(id, accepter) {
+    fetch(`/mercato/offre/${id}/repondre`, {
+        method: "POST", headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({accepter: accepter})
+    }).then(r => r.json()).then(d => { alert(d.message); location.reload(); });
+}
+</script>
+{% endblock %}

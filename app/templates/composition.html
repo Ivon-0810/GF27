@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block titre %}Tactique{% endblock %}
+{% block contenu %}
+<h1><i class="bi bi-diagram-3-fill text-accent"></i> Tactique — {{ club.nom }}</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="carte">
+            <h3>Formation & consignes</h3>
+            <div class="mb-3">
+                <label class="form-label">Formation</label>
+                <select id="formation" class="form-select">
+                    {% for f in ["4-4-2", "4-3-3", "3-5-2", "4-2-3-1", "5-3-2"] %}
+                    <option {{ "selected" if club.formation_favorite == f }}>{{ f }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Mentalité</label>
+                <select id="mentalite" class="form-select">
+                    <option value="offensif">Offensif</option>
+                    <option value="equilibre" selected>Équilibré</option>
+                    <option value="defensif">Défensif</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Style de jeu</label>
+                <select id="style" class="form-select">
+                    <option value="gegenpressing">Gegenpressing</option>
+                    <option value="possession" selected>Possession</option>
+                    <option value="contre_attaque">Contre-attaque</option>
+                    <option value="jeu_direct">Jeu direct</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Ligne défensive : <span id="valLigne">50</span></label>
+                <input type="range" min="0" max="100" value="50" class="form-range" id="ligne_defensive">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Intensité du pressing : <span id="valPressing">50</span></label>
+                <input type="range" min="0" max="100" value="50" class="form-range" id="pressing">
+            </div>
+            <button class="btn btn-fm" id="enregistrer">Enregistrer</button>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="carte">
+            <h3>Effectif disponible</h3>
+            <table class="table table-sm">
+                <thead><tr><th>Nom</th><th>Poste</th><th>Note</th><th>Forme</th></tr></thead>
+                <tbody>
+                {% for j in joueurs %}
+                    <tr>
+                        <td>{{ j.nom }}</td>
+                        <td><span class="badge-poste">{{ j.poste_principal }}</span></td>
+                        <td>{{ j.overall() }}</td>
+                        <td>{{ j.forme }}%</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <p class="text-secondary small mb-0">
+                Le placement des titulaires par glisser-déposer sur un terrain est
+                la prochaine étape prévue — pour l'instant, la formation et les
+                consignes d'équipe se gèrent ici.
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('ligne_defensive').addEventListener('input', e => {
+    document.getElementById('valLigne').textContent = e.target.value;
+});
+document.getElementById('pressing').addEventListener('input', e => {
+    document.getElementById('valPressing').textContent = e.target.value;
+});
+document.getElementById('enregistrer').addEventListener('click', () => {
+    fetch("{{ url_for('effectif.composition') }}", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            formation: document.getElementById('formation').value,
+            mentalite: document.getElementById('mentalite').value,
+            style: document.getElementById('style').value,
+            ligne_defensive: document.getElementById('ligne_defensive').value,
+            pressing: document.getElementById('pressing').value,
+        })
+    }).then(r => r.json()).then(d => alert(d.message));
+});
+</script>
+{% endblock %}

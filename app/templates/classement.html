@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block titre %}Classement{% endblock %}
+{% block contenu %}
+<h1><i class="bi bi-list-ol text-accent"></i> Classement — {{ division.nom }}</h1>
+<div class="carte">
+    <table class="table table-sm">
+        <thead>
+            <tr><th>#</th><th>Club</th><th>J</th><th>V</th><th>N</th><th>D</th>
+                <th>BP</th><th>BC</th><th>Diff</th><th>Pts</th></tr>
+        </thead>
+        <tbody>
+        {% for c in classement %}
+        <tr class="{{ 'table-active' if c.club.id == club.id }}">
+            <td>{{ loop.index }}</td>
+            <td>{{ c.club.nom }}</td>
+            <td>{{ c.joues }}</td>
+            <td>{{ c.v }}</td>
+            <td>{{ c.n }}</td>
+            <td>{{ c.d }}</td>
+            <td>{{ c.bp }}</td>
+            <td>{{ c.bc }}</td>
+            <td>{{ c.diff }}</td>
+            <td class="fw-bold">{{ c.points }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

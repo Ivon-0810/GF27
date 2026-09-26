@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block titre %}Recherche{% endblock %}
+{% block contenu %}
+<h1><i class="bi bi-search"></i> Résultats pour « {{ q }} »</h1>
+
+<div class="carte">
+    <h3><i class="bi bi-people-fill"></i> Joueurs</h3>
+    {% if joueurs %}
+    <table class="table">
+        <thead><tr><th>Nom</th><th>Club</th><th>Poste</th><th>Note</th></tr></thead>
+        <tbody>
+        {% for j in joueurs %}
+        <tr>
+            <td><a href="{{ url_for('effectif.fiche_joueur', joueur_id=j.id) }}">{{ j.nom }}</a></td>
+            <td>{{ j.club.nom if j.club else "Libre" }}</td>
+            <td><span class="badge-poste">{{ j.poste_principal }}</span></td>
+            <td>{{ j.overall() }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}<p class="text-secondary">Aucun joueur trouvé.</p>{% endif %}
+</div>
+
+<div class="carte">
+    <h3><i class="bi bi-shield-fill"></i> Clubs</h3>
+    {% if clubs %}
+    <div class="row row-cols-2 row-cols-md-4 g-3">
+        {% for c in clubs %}
+        <div class="col">
+            <div class="carte club-carte mb-0">
+                <div class="fw-bold">{{ c.nom }}</div>
+                <div class="text-secondary small">{{ c.division.nom }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}<p class="text-secondary">Aucun club trouvé.</p>{% endif %}
+</div>
+
+<div class="carte">
+    <h3><i class="bi bi-trophy-fill"></i> Compétitions</h3>
+    {% if ligues %}
+    <ul>{% for l in ligues %}<li>{{ l.nom }}</li>{% endfor %}</ul>
+    {% else %}<p class="text-secondary">Aucune compétition trouvée.</p>{% endif %}
+</div>
+{% endblock %}

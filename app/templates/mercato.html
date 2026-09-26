@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block titre %}Mercato{% endblock %}
+{% block contenu %}
+<h1>Mercato</h1>
+<div class="carte d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <p class="mb-0"><strong>Budget disponible :</strong> {{ "{:,.0f}".format(club.budget) }} €</p>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('mercato.offres_recues') }}" class="btn btn-outline-light btn-sm">
+            <i class="bi bi-envelope"></i> Offres reçues
+        </a>
+        <button class="btn btn-outline-light btn-sm" id="btnSimulerIA">
+            <i class="bi bi-cpu"></i> Simuler le mercato (IA)
+        </button>
+    </div>
+</div>
+<div class="carte">
+    <form method="get">
+        <input type="text" name="q" placeholder="Nom du joueur" value="{{ q }}">
+        <select name="poste">
+            <option value="">Tous postes</option>
+            {% for p in ["GB","DC","DD","DG","MDC","MC","MD","MG","MOC","AD","AG","BU"] %}
+            <option value="{{ p }}" {{ "selected" if poste == p }}>{{ p }}</option>
+            {% endfor %}
+        </select>
+        <button class="btn btn-outline-light" type="submit">Rechercher</button>
+    </form>
+</div>
+<div class="carte">
+    <table class="table">
+        <thead><tr><th>Nom</th><th>Club</th><th>Poste</th><th>Note</th><th>Valeur</th><th></th></tr></thead>
+        <tbody>
+        {% for j in joueurs %}
+        <tr>
+            <td>{{ j.nom }}</td>
+            <td>{{ j.club.nom if j.club else "Libre" }}</td>
+            <td><span class="badge-poste">{{ j.poste_principal }}</span></td>
+            <td>{{ j.overall() }}</td>
+            <td>{{ "{:,.0f}".format(j.valeur_marchande) }} €</td>
+            <td>
+                <button class="btn btn-fm" onclick="faireOffre({{ j.id }}, {{ j.valeur_marchande }})">Offre</button>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+<script>
+function faireOffre(joueurId, valeurEstimee) {
+    const montant = prompt("Montant de l'offre (€) :", Math.round(valeurEstimee));
+    if (!montant) return;
+    fetch("{{ url_for('mercato.faire_offre') }}", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({joueur_id: joueurId, montant: montant})
+    }).then(r => r.json()).then(d => { alert(d.message); location.reload(); });
+}
+
+document.getElementById('btnSimulerIA').addEventListener('click', () => {
+    fetch("{{ url_for('mercato.simuler_ia') }}", {method: "POST"})
+        .then(r => r.json()).then(d => {
+            alert(d.message + (d.mouvements.length ? "\n\n" + d.mouvements.join("\n") : ""));
+            location.reload();
+        });
+});
+</script>
+{% endblock %}

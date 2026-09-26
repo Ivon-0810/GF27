@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block titre %}Tableau de bord{% endblock %}
+{% block contenu %}
+<h1>{{ club.nom if club else "Aucun club sélectionné" }}</h1>
+{% if club %}
+<div class="carte">
+    <p><strong>Division :</strong> {{ club.division.nom }}</p>
+    <p><strong>Budget :</strong> {{ "{:,.0f}".format(club.budget) }} €</p>
+    <p><strong>Réputation :</strong> {{ club.reputation }}/100</p>
+    <p><strong>Formation favorite :</strong> {{ club.formation_favorite }}</p>
+    <p><strong>Saison :</strong> {{ saison.annee_debut }}-{{ saison.annee_fin }}</p>
+</div>
+{% endif %}
+{% endblock %}

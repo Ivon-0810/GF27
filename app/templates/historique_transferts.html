@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block titre %}Historique{% endblock %}
+{% block contenu %}
+<h1>Historique des transferts</h1>
+<div class="carte">
+    <table class="table">
+        <thead><tr><th>Date</th><th>Joueur</th><th>Vendeur</th><th>Acheteur</th><th>Opération</th><th>Montant</th><th>Statut</th></tr></thead>
+        <tbody>
+        {% for t in transferts %}
+        <tr>
+            <td>{{ t.date_operation.strftime('%d/%m/%Y') }}</td>
+            <td>{{ t.joueur.nom if t.joueur else t.joueur_id }}</td>
+            <td>{{ t.club_vendeur.nom if t.club_vendeur else "—" }}</td>
+            <td>{{ t.club_acheteur.nom if t.club_acheteur else "—" }}</td>
+            <td>{{ t.type_operation }}</td>
+            <td>{{ "{:,.0f}".format(t.montant) }} €</td>
+            <td>{{ t.statut }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

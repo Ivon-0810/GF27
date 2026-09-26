@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block titre %}Gestion Club{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark app-navbar sticky-top">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand fw-bold" href="{{ url_for('main.tableau_de_bord') }}">
+                <i class="bi bi-shield-fill-check text-accent"></i> Gestion Club
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navMain">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('main.tableau_de_bord') }}"><i class="bi bi-speedometer2"></i> Tableau de bord</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('effectif.voir_effectif') }}"><i class="bi bi-people-fill"></i> Effectif</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('effectif.composition') }}"><i class="bi bi-diagram-3-fill"></i> Tactique</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('saison.voir_calendrier') }}"><i class="bi bi-calendar3"></i> Calendrier</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('saison.voir_classement') }}"><i class="bi bi-list-ol"></i> Classement</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('mercato.marche_transferts') }}"><i class="bi bi-arrow-left-right"></i> Mercato</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('mercato.historique') }}"><i class="bi bi-clock-history"></i> Historique</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('palmares.voir_palmares') }}"><i class="bi bi-trophy-fill"></i> Palmarès</a></li>
+                </ul>
+                <form class="d-flex" role="search" action="{{ url_for('recherche.rechercher') }}" method="get">
+                    <input class="form-control form-control-sm search-input" type="search"
+                           name="q" placeholder="Rechercher un joueur, club..." value="{{ request.args.get('q', '') }}">
+                </form>
+            </div>
+        </div>
+    </nav>
+    <main class="contenu container-fluid px-4 py-4">
+        {% block contenu %}{% endblock %}
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block titre %}Match{% endblock %}
+{% block contenu %}
+<div class="carte text-center">
+    <div class="row align-items-center">
+        <div class="col-4 text-end fw-bold fs-5">{{ club_dom.nom }}</div>
+        <div class="col-4">
+            <div id="score" style="font-size:2.4rem; font-weight:800;">
+                {{ match.score_domicile or 0 }} - {{ match.score_exterieur or 0 }}
+            </div>
+            <div id="minute" class="text-secondary">{{ match.minute_courante }}'</div>
+        </div>
+        <div class="col-4 text-start fw-bold fs-5">{{ club_ext.nom }}</div>
+    </div>
+    <div class="mt-3">
+        <button class="btn btn-fm" id="avancer">Avancer le match</button>
+        <button class="btn btn-outline-light" id="simuler">Simuler instantanément</button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-5">
+        <div class="carte">
+            <h3>Statistiques live</h3>
+            {% for label, key in [("Possession", "possession"), ("Tirs", "tirs"), ("Tirs cadrés", "cadres"), ("xG", "xg")] %}
+            <div class="mb-2">
+                <div class="d-flex justify-content-between small">
+                    <span id="{{ key }}_dom_val">0</span><span class="text-secondary">{{ label }}</span><span id="{{ key }}_ext_val">0</span>
+                </div>
+                <div class="d-flex gap-1">
+                    <div class="stat-barre flex-fill"><div class="remplissage" id="{{ key }}_dom_bar" style="width:50%"></div></div>
+                    <div class="stat-barre flex-fill"><div class="remplissage ext" id="{{ key }}_ext_bar" style="width:50%; margin-left:auto;"></div></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="carte" id="panneauMiTemps" style="display:none;">
+            <h3><i class="bi bi-cup-hot"></i> Mi-temps — ajuster la tactique</h3>
+            <select id="mt_mentalite" class="form-select form-select-sm mb-2">
+                <option value="offensif">Offensif</option>
+                <option value="equilibre" selected>Équilibré</option>
+                <option value="defensif">Défensif</option>
+            </select>
+            <select id="mt_style" class="form-select form-select-sm mb-2">
+                <option value="gegenpressing">Gegenpressing</option>
+                <option value="possession" selected>Possession</option>
+                <option value="contre_attaque">Contre-attaque</option>
+                <option value="jeu_direct">Jeu direct</option>
+            </select>
+            <button class="btn btn-sm btn-fm" id="btnTactiqueMt">Appliquer</button>
+            <hr>
+            <h5>Faire un changement</h5>
+            <p class="text-secondary small mb-2">Indique les IDs joueur (voir l'effectif) — le
+            sélecteur visuel sera ajouté à l'étape suivante.</p>
+            <input type="number" id="mt_sortant" class="form-control form-control-sm mb-2" placeholder="ID joueur sortant">
+            <input type="number" id="mt_entrant" class="form-control form-control-sm mb-2" placeholder="ID joueur entrant">
+            <button class="btn btn-sm btn-outline-light" id="btnChangementMt">Remplacer</button>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        <div class="carte">
+            <h3>Fil du match</h3>
+            <div class="fil-commentaires" id="fil"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+const matchId = {{ match.id }};
+const compDomId = {{ comp_dom.id if comp_dom else "null" }};
+const compExtId = {{ comp_ext.id if comp_ext else "null" }};
+const clubUtilisateurId = {{ club_utilisateur_id or "null" }};
+const clubDomId = {{ club_dom.id }};
+const compUtilisateurId = (clubUtilisateurId === clubDomId) ? compDomId : compExtId;
+
+function majBarres(stats) {
+    const paires = [
+        ["possession", stats.possession_dom, stats.possession_ext],
+        ["tirs", stats.tirs_dom, stats.tirs_ext],
+        ["cadres", stats.cadres_dom, stats.cadres_ext],
+        ["xg", stats.xg_dom, stats.xg_ext],
+    ];
+    paires.forEach(([cle, dom, ext]) => {
+        document.getElementById(`${cle}_dom_val`).textContent = dom;
+        document.getElementById(`${cle}_ext_val`).textContent = ext;
+        const total = (parseFloat(dom) + parseFloat(ext)) || 1;
+        document.getElementById(`${cle}_dom_bar`).style.width = `${(dom / total) * 100}%`;
+        document.getElementById(`${cle}_ext_bar`).style.width = `${(ext / total) * 100}%`;
+    });
+}
+
+function ajouterAuFil(evenements) {
+    const fil = document.getElementById('fil');
+    evenements.forEach(e => {
+        if (!e.commentaire) return;
+        const div = document.createElement('div');
+        div.className = 'evt' + (e.type === 'but' ? ' but' : '');
+        div.textContent = e.commentaire;
+        fil.prepend(div);
+    });
+}
+
+document.getElementById('avancer').addEventListener('click', () => {
+    fetch(`/match/${matchId}/avancer`, {method: "POST"})
+        .then(r => r.json()).then(d => {
+            document.getElementById('score').textContent = `${d.score_domicile || 0} - ${d.score_exterieur || 0}`;
+            document.getElementById('minute').textContent = `${d.minute}'`;
+            ajouterAuFil(d.evenements);
+            majBarres(d.stats);
+            if (d.statut === 'mi_temps') {
+                document.getElementById('panneauMiTemps').style.display = 'block';
+            }
+            if (d.statut === 'termine') {
+                alert("Match terminé !");
+            }
+        });
+});
+
+document.getElementById('simuler').addEventListener('click', () => {
+    fetch(`/match/${matchId}/simuler`, {method: "POST"})
+        .then(r => r.json()).then(d => {
+            document.getElementById('score').textContent = `${d.score_domicile} - ${d.score_exterieur}`;
+            document.getElementById('minute').textContent = `90'`;
+            ajouterAuFil(d.evenements);
+            majBarres(d.stats);
+        });
+});
+
+document.getElementById('btnTactiqueMt').addEventListener('click', () => {
+    if (!compUtilisateurId) { alert("Pas de composition à ajuster."); return; }
+    fetch(`/match/${matchId}/tactique`, {
+        method: "POST", headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            composition_id: compUtilisateurId,
+            consigne_mentalite: document.getElementById('mt_mentalite').value,
+            consigne_style: document.getElementById('mt_style').value,
+        })
+    }).then(r => r.json()).then(d => alert(d.message));
+});
+
+document.getElementById('btnChangementMt').addEventListener('click', () => {
+    if (!compUtilisateurId) { alert("Pas de composition à ajuster."); return; }
+    fetch(`/match/${matchId}/changement`, {
+        method: "POST", headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            composition_id: compUtilisateurId,
+            joueur_sortant_id: document.getElementById('mt_sortant').value,
+            joueur_entrant_id: document.getElementById('mt_entrant').value,
+        })
+    }).then(r => r.json()).then(d => {
+        if (d.ok) { ajouterAuFil([{commentaire: d.commentaire, type: 'changement'}]); }
+        else { alert(d.message); }
+    });
+});
+</script>
+{% endblock %}

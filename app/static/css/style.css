@@ -1,0 +1,66 @@
+:root {
+    --fm-fond: #0d1117;
+    --fm-carte: #161d29;
+    --fm-carte-claire: #1e2736;
+    --fm-accent: #2dd881;
+    --fm-accent-2: #ffb020;
+    --fm-texte-att: #8b96a8;
+    --fm-bordure: #263041;
+}
+body {
+    background: var(--fm-fond);
+    color: #e8ecf1;
+}
+.text-accent { color: var(--fm-accent) !important; }
+.app-navbar {
+    background: var(--fm-carte) !important;
+    border-bottom: 1px solid var(--fm-bordure);
+}
+.app-navbar .nav-link { color: var(--fm-texte-att); font-size: 0.9rem; }
+.app-navbar .nav-link:hover { color: var(--fm-accent); }
+.search-input { width: 260px; background: var(--fm-carte-claire); border-color: var(--fm-bordure); color: #fff; }
+
+.carte, .card {
+    background: var(--fm-carte) !important;
+    border: 1px solid var(--fm-bordure) !important;
+    border-radius: 12px;
+}
+.carte { padding: 20px; margin-bottom: 18px; }
+
+table { color: #e8ecf1; }
+.table { --bs-table-bg: transparent; --bs-table-color: #e8ecf1; border-color: var(--fm-bordure); }
+.table thead th { color: var(--fm-texte-att); text-transform: uppercase; font-size: 0.72rem; border-bottom-color: var(--fm-bordure); }
+
+.badge-poste {
+    display: inline-block; padding: 2px 9px; border-radius: 20px;
+    font-size: 0.72rem; font-weight: 700; background: var(--fm-accent); color: #05230f;
+}
+.badge-note {
+    display: inline-block; min-width: 30px; text-align: center; padding: 2px 7px;
+    border-radius: 6px; font-weight: 700; font-size: 0.8rem;
+}
+.note-haute { background: var(--fm-accent); color: #05230f; }
+.note-moyenne { background: var(--fm-accent-2); color: #241800; }
+.note-basse { background: #d9455f; color: #fff; }
+
+.btn-fm { background: var(--fm-accent); border: none; color: #05230f; font-weight: 600; }
+.btn-fm:hover { background: #24c073; color: #05230f; }
+
+.stat-barre { height: 8px; border-radius: 4px; background: var(--fm-carte-claire); overflow: hidden; }
+.stat-barre .remplissage { height: 100%; background: var(--fm-accent); }
+.stat-barre .remplissage.ext { background: var(--fm-accent-2); }
+
+.fil-commentaires {
+    max-height: 420px; overflow-y: auto; font-size: 0.9rem;
+}
+.fil-commentaires .evt { padding: 8px 10px; border-bottom: 1px solid var(--fm-bordure); }
+.fil-commentaires .evt.but { color: var(--fm-accent); font-weight: 600; }
+
+.club-carte { text-align: center; transition: border-color 0.15s; }
+.club-carte:hover { border-color: var(--fm-accent) !important; }
+.club-carte a { color: inherit; text-decoration: none; }
+
+.podium-rang { font-size: 1.6rem; font-weight: 800; }
+.podium-1 { color: #ffd54a; }
+.podium-2 { color: #c8cdd4; }
+.podium-3 { color: #cd8a4a; }

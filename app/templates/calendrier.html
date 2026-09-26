@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block titre %}Calendrier{% endblock %}
+{% block contenu %}
+<h1><i class="bi bi-calendar3 text-accent"></i> Calendrier — {{ saison.annee_debut }}-{{ saison.annee_fin }}</h1>
+
+{% if saison_finie %}
+<div class="carte text-center">
+    <p class="mb-3">Tous les matchs de la saison ont été joués.</p>
+    <button class="btn btn-fm" id="btnCloturer">Clôturer la saison et calculer le palmarès</button>
+</div>
+{% elif matchs %}
+<div class="carte">
+    <h3>Journée {{ journee }}</h3>
+    <table class="table table-sm">
+        <thead><tr><th>Domicile</th><th></th><th>Extérieur</th><th>Statut</th><th></th></tr></thead>
+        <tbody>
+        {% for m in matchs %}
+        <tr class="{{ 'table-active' if m.id == (match_du_club.id if match_du_club else None) }}">
+            <td>{{ m.club_domicile.nom if m.club_domicile else m.club_domicile_id }}</td>
+            <td class="text-center">
+                {% if m.statut in ["termine", "simule"] %}{{ m.score_domicile }} - {{ m.score_exterieur }}{% else %}vs{% endif %}
+            </td>
+            <td>{{ m.club_exterieur.nom if m.club_exterieur else m.club_exterieur_id }}</td>
+            <td><span class="text-secondary small">{{ m.statut }}</span></td>
+            <td>
+                {% if m.id == (match_du_club.id if match_du_club else None) and m.statut == "a_jouer" %}
+                <a href="{{ url_for('match.jour_de_match', match_id=m.id) }}" class="btn btn-sm btn-fm">Jouer</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% if match_du_club %}
+    <p class="text-secondary small">Joue d'abord ton match, puis simule le reste de la journée
+    (ou simule tout si tu ne veux pas jouer celui-ci non plus).</p>
+    {% endif %}
+    <button class="btn btn-outline-light" id="btnSimuler">Simuler la journée (sauf mon match)</button>
+</div>
+{% else %}
+<div class="carte"><p>Aucun match programmé — génère d'abord le calendrier de la saison.</p></div>
+{% endif %}
+
+<script>
+document.getElementById('btnSimuler')?.addEventListener('click', () => {
+    fetch("{{ url_for('saison.simuler_journee') }}", {method: "POST"})
+        .then(r => r.json()).then(d => { alert(d.message); location.reload(); });
+});
+document.getElementById('btnCloturer')?.addEventListener('click', () => {
+    fetch("{{ url_for('saison.cloturer') }}", {method: "POST"})
+        .then(r => r.json()).then(d => { alert(d.message); location.reload(); });
+});
+</script>
+{% endblock %}
