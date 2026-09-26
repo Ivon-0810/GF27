@@ -1,0 +1,36 @@
+name: Compiler Gestion Club (.exe)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Installer les dépendances
+        run: |
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Compiler l'exécutable
+        run: >
+          pyinstaller --noconfirm --onefile --name GestionClub
+          --add-data "app/templates;templates"
+          --add-data "app/static;static"
+          run.py
+
+      - name: Publier l'exécutable
+        uses: actions/upload-artifact@v4
+        with:
+          name: GestionClub-windows
+          path: dist/GestionClub.exe
